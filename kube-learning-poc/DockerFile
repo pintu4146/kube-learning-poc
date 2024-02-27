@@ -1,0 +1,12 @@
+# Stage 1: Build the application
+FROM adoptopenjdk/openjdk21:alpine AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Create the final Docker image
+FROM adoptopenjdk/openjdk21:alpine-jre
+WORKDIR /app
+COPY --from=build /app/target/kube-learning-poc.jar ./kube-learning-poc.jar
+EXPOSE 8080
+CMD ["java", "-jar", "kube-learning-poc.jar"]
